@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-feature-settings: "tnum" 1, "cv02" 1;
+  }
+  body {
+    font-family: "Inter", system-ui, sans-serif;
+  }
+  h1, h2, h3, h4, .font-display {
+    font-family: "Sora", system-ui, sans-serif;
+  }
+  .tabular {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+  ::selection {
+    background-color: theme("colors.brass.200");
+  }
+  :focus-visible {
+    outline: 2px solid theme("colors.brass.400");
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-surface border border-ledger rounded-xl shadow-card;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg text-sm font-medium
+      transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed
+      focus-visible:outline-2 focus-visible:outline-brass-400 px-4 py-2;
+  }
+  .btn-primary {
+    @apply btn bg-ink-800 text-white hover:bg-ink-700 active:bg-ink-900;
+  }
+  .btn-accent {
+    @apply btn bg-brass-400 text-ink-900 hover:bg-brass-300 active:bg-brass-500 font-semibold;
+  }
+  .btn-ghost {
+    @apply btn bg-transparent text-ink-600 hover:bg-ink-50;
+  }
+  .btn-danger {
+    @apply btn bg-danger text-white hover:opacity-90;
+  }
+  .input {
+    @apply w-full rounded-lg border border-ledger bg-surface px-3 py-2 text-sm text-ink-800
+      placeholder:text-ink-300 focus-visible:outline-2 focus-visible:outline-brass-400
+      disabled:bg-ink-50 disabled:text-ink-300;
+  }
+  .label {
+    @apply block text-xs font-medium text-ink-500 mb-1.5;
+  }
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-2xs font-semibold uppercase tracking-wide;
+  }
+}
