@@ -7,6 +7,10 @@ import {
   Settings,
   LogOut,
   ChevronDown,
+  Package,
+  Boxes,
+  Truck,
+  UserRound,
   type LucideIcon,
 } from "lucide-react";
 import { useState } from "react";
@@ -28,6 +32,10 @@ export default function Layout() {
 
   const navItems: NavItem[] = [
     { to: "/", label: "Painel", icon: LayoutDashboard, show: true },
+    { to: "/produtos", label: "Produtos", icon: Package, show: can("products", "view") || isSuperAdmin },
+    { to: "/estoque", label: "Estoque", icon: Boxes, show: can("stock", "view") || isSuperAdmin },
+    { to: "/fornecedores", label: "Fornecedores", icon: Truck, show: can("suppliers", "view") || isSuperAdmin },
+    { to: "/clientes", label: "Clientes", icon: UserRound, show: can("customers", "view") || isSuperAdmin },
     {
       to: "/empresas",
       label: "Empresas e filiais",

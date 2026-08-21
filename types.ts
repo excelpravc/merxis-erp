@@ -162,3 +162,127 @@ export interface Paginated<T> {
   page: number;
   pageSize: number;
 }
+
+// ---------------------------------------------------------------------------
+// Fase 2 — Produtos, categorias, marcas, fornecedores, clientes, estoque
+// ---------------------------------------------------------------------------
+
+export interface ProductCategory {
+  id: UUID;
+  tenantId: UUID;
+  name: string;
+  parentId: UUID | null;
+  createdAt: string;
+}
+
+export interface ProductBrand {
+  id: UUID;
+  tenantId: UUID;
+  name: string;
+  createdAt: string;
+}
+
+export type ProductUnit =
+  | "UN" // unidade
+  | "KG" // quilograma
+  | "G" // grama
+  | "L" // litro
+  | "ML" // mililitro
+  | "CX" // caixa
+  | "PCT" // pacote
+  | "DZ"; // dúzia
+
+export interface Product {
+  id: UUID;
+  tenantId: UUID;
+  sku: string;
+  barcode: string | null;
+  name: string;
+  description: string | null;
+  categoryId: UUID | null;
+  categoryName?: string | null;
+  brandId: UUID | null;
+  brandName?: string | null;
+  unit: ProductUnit;
+  costPrice: number;
+  salePrice: number;
+  minStock: number;
+  maxStock: number | null;
+  perishable: boolean;
+  active: boolean;
+  totalStock?: number; // soma de todas as filiais — preenchido pelo backend na listagem
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Supplier {
+  id: UUID;
+  tenantId: UUID;
+  legalName: string;
+  tradeName: string | null;
+  cnpj: string | null;
+  stateRegistration: string | null;
+  phone: string | null;
+  email: string | null;
+  city: string | null;
+  state: string | null;
+  paymentTerms: string | null;
+  active: boolean;
+  createdAt: string;
+}
+
+export interface Customer {
+  id: UUID;
+  tenantId: UUID;
+  name: string;
+  document: string | null; // CPF ou CNPJ
+  phone: string | null;
+  email: string | null;
+  city: string | null;
+  state: string | null;
+  creditLimit: number;
+  active: boolean;
+  createdAt: string;
+}
+
+export interface StockLevel {
+  productId: UUID;
+  branchId: UUID;
+  branchName?: string;
+  quantity: number;
+  reservedQuantity: number;
+  minStock: number;
+  maxStock: number | null;
+  updatedAt: string;
+}
+
+export type StockMovementType =
+  | "entry" // entrada manual
+  | "exit" // saída manual
+  | "purchase"
+  | "sale"
+  | "return"
+  | "transfer_in"
+  | "transfer_out"
+  | "adjustment"
+  | "loss"
+  | "damage"
+  | "inventory";
+
+export interface StockMovement {
+  id: UUID;
+  tenantId: UUID;
+  branchId: UUID;
+  branchName?: string;
+  productId: UUID;
+  productName?: string;
+  type: StockMovementType;
+  quantity: number;
+  previousQuantity: number;
+  newQuantity: number;
+  referenceType: string | null;
+  referenceId: string | null;
+  notes: string | null;
+  userName?: string;
+  createdAt: string;
+}

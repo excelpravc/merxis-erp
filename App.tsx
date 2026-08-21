@@ -8,6 +8,10 @@ import Companies from "./Companies";
 import Users from "./Users";
 import Roles from "./Roles";
 import SettingsPage from "./SettingsPage";
+import Products from "./Products";
+import Stock from "./Stock";
+import Suppliers from "./Suppliers";
+import Customers from "./Customers";
 
 export default function App() {
   return (
@@ -28,6 +32,10 @@ export default function App() {
             <Route path="empresas" element={<Companies />} />
             <Route path="usuarios" element={<Users />} />
             <Route path="perfis" element={<Roles />} />
+            <Route path="produtos" element={<Products />} />
+            <Route path="estoque" element={<Stock />} />
+            <Route path="fornecedores" element={<Suppliers />} />
+            <Route path="clientes" element={<Customers />} />
             <Route path="configuracoes" element={<SettingsPage />} />
           </Route>
         </Routes>
