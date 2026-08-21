@@ -147,7 +147,27 @@ async function listCompanies(req: VercelRequest, res: VercelResponse, tenantId: 
 
 async function listBranches(req: VercelRequest, res: VercelResponse, tenantId: string) {
   const companyId = String(req.query.companyId ?? "");
-  if (!companyId) throw badRequest("Informe a empresa.");
+
+  if (!companyId) {
+    // Sem companyId: retorna todas as filiais do tenant (usado por seletores
+    // de filial em outros módulos, ex: estoque).
+    const rows = await query(
+      `SELECT b.*, c.trade_name as company_trade_name, c.legal_name as company_legal_name
+       FROM branches b JOIN companies c ON c.id = b.company_id
+       WHERE b.tenant_id = ? ORDER BY c.is_matrix DESC, b.name ASC`,
+      [tenantId]
+    );
+    const payload: Paginated<Branch & { companyName?: string }> = {
+      items: rows.map((r) => ({
+        ...mapBranchRow(r),
+        companyName: (r.company_trade_name as string) || (r.company_legal_name as string),
+      })),
+      total: rows.length,
+      page: 1,
+      pageSize: rows.length,
+    };
+    return sendJson(res, 200, payload);
+  }
 
   const company = await queryOne(`SELECT id FROM companies WHERE id = ? AND tenant_id = ?`, [
     companyId,

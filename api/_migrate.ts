@@ -245,6 +245,15 @@ async function seedDemoTenantAndSuperAdmin() {
     await exec(`INSERT INTO user_roles (user_id, role_id) VALUES (?, ?)`, [userId, superAdminRole.id]);
   }
 
+  const defaultCategories = ["Mercearia", "Hortifruti", "Bebidas", "Limpeza", "Higiene e Beleza", "Açougue", "Padaria", "Laticínios"];
+  for (const name of defaultCategories) {
+    await exec(`INSERT INTO product_categories (id, tenant_id, name) VALUES (?, ?, ?)`, [
+      uuid(),
+      tenantId,
+      name,
+    ]);
+  }
+
   console.log("✔ Tenant de demonstração e super admin criados:");
   console.log(`   E-mail: ${email}`);
   console.log(`   Senha:  ${password}`);

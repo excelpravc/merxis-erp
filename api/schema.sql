@@ -171,3 +171,134 @@ CREATE TABLE IF NOT EXISTS audit_logs (
 CREATE INDEX IF NOT EXISTS idx_audit_tenant ON audit_logs(tenant_id);
 CREATE INDEX IF NOT EXISTS idx_audit_created ON audit_logs(created_at);
 CREATE INDEX IF NOT EXISTS idx_audit_module ON audit_logs(module);
+
+-- ============================================================
+-- Fase 2 — Produtos, categorias, marcas, fornecedores, clientes, estoque
+-- ============================================================
+
+-- --------------------------------------------------------------
+-- Categorias e marcas
+-- --------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS product_categories (
+  id            TEXT PRIMARY KEY,
+  tenant_id     TEXT NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  name          TEXT NOT NULL,
+  parent_id     TEXT REFERENCES product_categories(id) ON DELETE SET NULL,
+  created_at    TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE (tenant_id, name, parent_id)
+);
+CREATE INDEX IF NOT EXISTS idx_categories_tenant ON product_categories(tenant_id);
+
+CREATE TABLE IF NOT EXISTS product_brands (
+  id            TEXT PRIMARY KEY,
+  tenant_id     TEXT NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  name          TEXT NOT NULL,
+  created_at    TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE (tenant_id, name)
+);
+CREATE INDEX IF NOT EXISTS idx_brands_tenant ON product_brands(tenant_id);
+
+-- --------------------------------------------------------------
+-- Produtos
+-- --------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS products (
+  id              TEXT PRIMARY KEY,
+  tenant_id       TEXT NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  sku             TEXT NOT NULL,
+  barcode         TEXT,
+  name            TEXT NOT NULL,
+  description     TEXT,
+  category_id     TEXT REFERENCES product_categories(id) ON DELETE SET NULL,
+  brand_id        TEXT REFERENCES product_brands(id) ON DELETE SET NULL,
+  unit            TEXT NOT NULL DEFAULT 'UN',
+  cost_price      REAL NOT NULL DEFAULT 0,
+  sale_price      REAL NOT NULL DEFAULT 0,
+  min_stock       REAL NOT NULL DEFAULT 0,
+  max_stock       REAL,
+  perishable      INTEGER NOT NULL DEFAULT 0,
+  active          INTEGER NOT NULL DEFAULT 1,
+  created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at      TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE (tenant_id, sku)
+);
+CREATE INDEX IF NOT EXISTS idx_products_tenant ON products(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_products_barcode ON products(barcode);
+CREATE INDEX IF NOT EXISTS idx_products_category ON products(category_id);
+CREATE INDEX IF NOT EXISTS idx_products_brand ON products(brand_id);
+
+-- --------------------------------------------------------------
+-- Fornecedores
+-- --------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS suppliers (
+  id                    TEXT PRIMARY KEY,
+  tenant_id             TEXT NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  legal_name            TEXT NOT NULL,
+  trade_name            TEXT,
+  cnpj                  TEXT,
+  state_registration    TEXT,
+  phone                 TEXT,
+  email                 TEXT,
+  city                  TEXT,
+  state                 TEXT,
+  payment_terms         TEXT,
+  active                INTEGER NOT NULL DEFAULT 1,
+  created_at            TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_suppliers_tenant ON suppliers(tenant_id);
+
+-- --------------------------------------------------------------
+-- Clientes
+-- --------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS customers (
+  id              TEXT PRIMARY KEY,
+  tenant_id       TEXT NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  name            TEXT NOT NULL,
+  document        TEXT,
+  phone           TEXT,
+  email           TEXT,
+  city            TEXT,
+  state           TEXT,
+  credit_limit    REAL NOT NULL DEFAULT 0,
+  active          INTEGER NOT NULL DEFAULT 1,
+  created_at      TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_customers_tenant ON customers(tenant_id);
+
+-- --------------------------------------------------------------
+-- Estoque (posição atual por filial + histórico de movimentações)
+-- --------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS stock (
+  id                  TEXT PRIMARY KEY,
+  tenant_id           TEXT NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  branch_id           TEXT NOT NULL REFERENCES branches(id) ON DELETE CASCADE,
+  product_id          TEXT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+  quantity            REAL NOT NULL DEFAULT 0,
+  reserved_quantity   REAL NOT NULL DEFAULT 0,
+  updated_at          TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE (branch_id, product_id)
+);
+CREATE INDEX IF NOT EXISTS idx_stock_tenant ON stock(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_stock_branch ON stock(branch_id);
+CREATE INDEX IF NOT EXISTS idx_stock_product ON stock(product_id);
+
+CREATE TABLE IF NOT EXISTS stock_movements (
+  id                  TEXT PRIMARY KEY,
+  tenant_id           TEXT NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  branch_id           TEXT NOT NULL REFERENCES branches(id) ON DELETE CASCADE,
+  product_id          TEXT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+  type                TEXT NOT NULL CHECK (type IN
+                        ('entry','exit','purchase','sale','return','transfer_in','transfer_out',
+                         'adjustment','loss','damage','inventory')),
+  quantity            REAL NOT NULL,
+  previous_quantity   REAL NOT NULL,
+  new_quantity        REAL NOT NULL,
+  reference_type      TEXT,
+  reference_id        TEXT,
+  notes               TEXT,
+  user_id             TEXT REFERENCES users(id) ON DELETE SET NULL,
+  created_at          TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_stock_mov_tenant ON stock_movements(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_stock_mov_branch ON stock_movements(branch_id);
+CREATE INDEX IF NOT EXISTS idx_stock_mov_product ON stock_movements(product_id);
+CREATE INDEX IF NOT EXISTS idx_stock_mov_created ON stock_movements(created_at);
