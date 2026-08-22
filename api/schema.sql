@@ -1,22 +1,22 @@
--- ============================================================
--- ERP Varejo SaaS — Schema Fase 1
--- Multi-tenant: tenants -> companies -> branches
--- Autenticação, RBAC (perfis/permissões) e auditoria
--- Compatível com Turso / libSQL (SQLite)
--- ============================================================
+
+
+
+
+
+
 
 PRAGMA foreign_keys = ON;
 
--- --------------------------------------------------------------
--- Tenants (contas do SaaS) e planos
--- --------------------------------------------------------------
+
+
+
 CREATE TABLE IF NOT EXISTS plans (
   id              TEXT PRIMARY KEY,
-  key             TEXT NOT NULL UNIQUE,          -- 'basico' | 'profissional' | 'premium' | custom
+  key             TEXT NOT NULL UNIQUE,          
   name            TEXT NOT NULL,
-  max_users       INTEGER,                       -- NULL = ilimitado
-  max_branches    INTEGER,                       -- NULL = ilimitado
-  features        TEXT,                          -- JSON com flags de módulos habilitados
+  max_users       INTEGER,                       
+  max_branches    INTEGER,                       
+  features        TEXT,                          
   created_at      TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
@@ -42,9 +42,9 @@ CREATE TABLE IF NOT EXISTS subscriptions (
 );
 CREATE INDEX IF NOT EXISTS idx_subscriptions_tenant ON subscriptions(tenant_id);
 
--- --------------------------------------------------------------
--- Empresas e filiais
--- --------------------------------------------------------------
+
+
+
 CREATE TABLE IF NOT EXISTS companies (
   id                      TEXT PRIMARY KEY,
   tenant_id               TEXT NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
@@ -90,9 +90,9 @@ CREATE TABLE IF NOT EXISTS branches (
 CREATE INDEX IF NOT EXISTS idx_branches_tenant ON branches(tenant_id);
 CREATE INDEX IF NOT EXISTS idx_branches_company ON branches(company_id);
 
--- --------------------------------------------------------------
--- Usuários
--- --------------------------------------------------------------
+
+
+
 CREATE TABLE IF NOT EXISTS users (
   id                      TEXT PRIMARY KEY,
   tenant_id               TEXT NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
@@ -118,12 +118,12 @@ CREATE TABLE IF NOT EXISTS user_branches (
   PRIMARY KEY (user_id, branch_id)
 );
 
--- --------------------------------------------------------------
--- RBAC: perfis, permissões, vínculos
--- --------------------------------------------------------------
+
+
+
 CREATE TABLE IF NOT EXISTS roles (
   id              TEXT PRIMARY KEY,
-  tenant_id       TEXT REFERENCES tenants(id) ON DELETE CASCADE, -- NULL = perfil global de sistema
+  tenant_id       TEXT REFERENCES tenants(id) ON DELETE CASCADE, 
   key             TEXT NOT NULL,
   name            TEXT NOT NULL,
   description     TEXT,
@@ -142,7 +142,7 @@ CREATE TABLE IF NOT EXISTS permissions (
 CREATE TABLE IF NOT EXISTS role_permissions (
   role_id         TEXT NOT NULL REFERENCES roles(id) ON DELETE CASCADE,
   permission_id   TEXT NOT NULL REFERENCES permissions(id) ON DELETE CASCADE,
-  branch_id       TEXT REFERENCES branches(id) ON DELETE CASCADE, -- NULL = todas as filiais
+  branch_id       TEXT REFERENCES branches(id) ON DELETE CASCADE, 
   PRIMARY KEY (role_id, permission_id, branch_id)
 );
 
@@ -152,9 +152,9 @@ CREATE TABLE IF NOT EXISTS user_roles (
   PRIMARY KEY (user_id, role_id)
 );
 
--- --------------------------------------------------------------
--- Auditoria
--- --------------------------------------------------------------
+
+
+
 CREATE TABLE IF NOT EXISTS audit_logs (
   id              TEXT PRIMARY KEY,
   tenant_id       TEXT NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
@@ -163,8 +163,8 @@ CREATE TABLE IF NOT EXISTS audit_logs (
   action          TEXT NOT NULL,
   record_id       TEXT,
   description     TEXT NOT NULL,
-  previous_value  TEXT, -- JSON
-  new_value       TEXT, -- JSON
+  previous_value  TEXT, 
+  new_value       TEXT, 
   ip_address      TEXT,
   created_at      TEXT NOT NULL DEFAULT (datetime('now'))
 );
@@ -172,13 +172,13 @@ CREATE INDEX IF NOT EXISTS idx_audit_tenant ON audit_logs(tenant_id);
 CREATE INDEX IF NOT EXISTS idx_audit_created ON audit_logs(created_at);
 CREATE INDEX IF NOT EXISTS idx_audit_module ON audit_logs(module);
 
--- ============================================================
--- Fase 2 — Produtos, categorias, marcas, fornecedores, clientes, estoque
--- ============================================================
 
--- --------------------------------------------------------------
--- Categorias e marcas
--- --------------------------------------------------------------
+
+
+
+
+
+
 CREATE TABLE IF NOT EXISTS product_categories (
   id            TEXT PRIMARY KEY,
   tenant_id     TEXT NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
@@ -198,9 +198,9 @@ CREATE TABLE IF NOT EXISTS product_brands (
 );
 CREATE INDEX IF NOT EXISTS idx_brands_tenant ON product_brands(tenant_id);
 
--- --------------------------------------------------------------
--- Produtos
--- --------------------------------------------------------------
+
+
+
 CREATE TABLE IF NOT EXISTS products (
   id              TEXT PRIMARY KEY,
   tenant_id       TEXT NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
@@ -226,9 +226,9 @@ CREATE INDEX IF NOT EXISTS idx_products_barcode ON products(barcode);
 CREATE INDEX IF NOT EXISTS idx_products_category ON products(category_id);
 CREATE INDEX IF NOT EXISTS idx_products_brand ON products(brand_id);
 
--- --------------------------------------------------------------
--- Fornecedores
--- --------------------------------------------------------------
+
+
+
 CREATE TABLE IF NOT EXISTS suppliers (
   id                    TEXT PRIMARY KEY,
   tenant_id             TEXT NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
@@ -246,9 +246,9 @@ CREATE TABLE IF NOT EXISTS suppliers (
 );
 CREATE INDEX IF NOT EXISTS idx_suppliers_tenant ON suppliers(tenant_id);
 
--- --------------------------------------------------------------
--- Clientes
--- --------------------------------------------------------------
+
+
+
 CREATE TABLE IF NOT EXISTS customers (
   id              TEXT PRIMARY KEY,
   tenant_id       TEXT NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
@@ -264,9 +264,9 @@ CREATE TABLE IF NOT EXISTS customers (
 );
 CREATE INDEX IF NOT EXISTS idx_customers_tenant ON customers(tenant_id);
 
--- --------------------------------------------------------------
--- Estoque (posição atual por filial + histórico de movimentações)
--- --------------------------------------------------------------
+
+
+
 CREATE TABLE IF NOT EXISTS stock (
   id                  TEXT PRIMARY KEY,
   tenant_id           TEXT NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
