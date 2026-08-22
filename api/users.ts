@@ -18,7 +18,7 @@ import type { Paginated, User } from "../types.js";
 const createSchema = z.object({
   name: z.string().min(2, "Informe o nome completo."),
   email: z.string().email("Informe um e-mail válido."),
-  password: z.string().min(8, "A senha deve ter ao menos 8 caracteres."),
+  password: z.string().min(8, "A senha deve ter ao menos 8 caracteres.").optional().or(z.literal("")),
   roleIds: z.array(z.string()).optional().default([]),
 });
 
@@ -161,7 +161,8 @@ async function createUser(req: VercelRequest, res: VercelResponse, session: Reso
   }
 
   const id = uuid();
-  const passwordHash = await hashPassword(data.password);
+  const rawPassword = (data.password && data.password.length >= 8) ? data.password : uuid();
+  const passwordHash = await hashPassword(rawPassword);
 
   await exec(
     `INSERT INTO users (id, tenant_id, name, email, password_hash, status) VALUES (?, ?, ?, ?, ?, 'active')`,
