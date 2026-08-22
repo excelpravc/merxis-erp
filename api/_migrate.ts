@@ -2,8 +2,8 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { v4 as uuid } from "uuid";
-import { db, exec, queryOne } from "./_db";
-import { hashPassword } from "./_auth";
+import { db, exec, queryOne } from "./_db.js";
+import { hashPassword } from "./_auth.js";
 
 // Script de migração/seed. Execução:
 //   npm run migrate         -> aplica o schema.sql no banco Turso configurado em .env

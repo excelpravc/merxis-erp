@@ -1,18 +1,18 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { v4 as uuid } from "uuid";
 import { z } from "zod";
-import { query, queryOne, exec } from "./_db";
+import { query, queryOne, exec } from "./_db.js";
 import {
   hashPassword,
   verifyPassword,
   signSessionToken,
   setSessionCookie,
   clearSessionCookie,
-} from "./_auth";
-import { resolveSession } from "./_tenant";
-import { badRequest, sendError, sendJson, unauthorized, forbidden } from "./_http";
-import { recordAudit } from "./_audit";
-import type { Session } from "../types";
+} from "./_auth.js";
+import { resolveSession } from "./_tenant.js";
+import { badRequest, sendError, sendJson, unauthorized, forbidden } from "./_http.js";
+import { recordAudit } from "./_audit.js";
+import type { Session } from "../types.js";
 
 // POST /api/auth  { action: "login" | "logout" | "register" }
 // GET  /api/auth?action=session

@@ -1,11 +1,11 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { v4 as uuid } from "uuid";
 import { z } from "zod";
-import { query, queryOne, exec } from "./_db";
-import { resolveSession, requirePermission, type ResolvedSession } from "./_tenant";
-import { badRequest, conflict, notFound, sendError, sendJson } from "./_http";
-import { recordAudit } from "./_audit";
-import type { Paginated, Supplier } from "../types";
+import { query, queryOne, exec } from "./_db.js";
+import { resolveSession, requirePermission, type ResolvedSession } from "./_tenant.js";
+import { badRequest, conflict, notFound, sendError, sendJson } from "./_http.js";
+import { recordAudit } from "./_audit.js";
+import type { Paginated, Supplier } from "../types.js";
 
 // GET   /api/suppliers?search=&page=&pageSize=  -> lista fornecedores do tenant
 // POST  /api/suppliers                           -> cria fornecedor

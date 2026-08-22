@@ -1,8 +1,8 @@
 import type { VercelRequest } from "@vercel/node";
-import { query, queryOne } from "./_db";
-import { readSessionToken, verifySessionToken } from "./_auth";
-import { forbidden, unauthorized } from "./_http";
-import type { PermissionAction, PermissionModule } from "../types";
+import { query, queryOne } from "./_db.js";
+import { readSessionToken, verifySessionToken } from "./_auth.js";
+import { forbidden, unauthorized } from "./_http.js";
+import type { PermissionAction, PermissionModule } from "../types.js";
 
 // Resolve a sessão autenticada a partir do cookie httpOnly.
 // O tenant_id NUNCA é aceito vindo do corpo/query da requisição (regra #49) —

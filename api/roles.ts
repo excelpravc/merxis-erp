@@ -1,11 +1,11 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { v4 as uuid } from "uuid";
 import { z } from "zod";
-import { query, queryOne, exec } from "./_db";
-import { resolveSession, requirePermission, type ResolvedSession } from "./_tenant";
-import { badRequest, conflict, forbidden, notFound, sendError, sendJson } from "./_http";
-import { recordAudit } from "./_audit";
-import type { Permission, Role } from "../types";
+import { query, queryOne, exec } from "./_db.js";
+import { resolveSession, requirePermission, type ResolvedSession } from "./_tenant.js";
+import { badRequest, conflict, forbidden, notFound, sendError, sendJson } from "./_http.js";
+import { recordAudit } from "./_audit.js";
+import type { Permission, Role } from "../types.js";
 
 // GET /api/roles                                    -> perfis visíveis ao tenant (sistema + personalizados)
 // GET /api/roles?action=permissions                 -> catálogo completo de permissões (module x action)

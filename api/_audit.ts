@@ -1,6 +1,6 @@
 import { v4 as uuid } from "uuid";
-import { exec } from "./_db";
-import type { ResolvedSession } from "./_tenant";
+import { exec } from "./_db.js";
+import type { ResolvedSession } from "./_tenant.js";
 
 // Registro de auditoria centralizado. Chamado a partir das rotas sempre que
 // uma operação sensível acontece (criar/editar/excluir empresa, usuário, permissões...).
