@@ -11,13 +11,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setSession(s);
   }, []);
 
-  useEffect(() => {
+    useEffect(() => {
     let mounted = true;
     (async () => {
-      const s = await fetchSession();
-      if (mounted) {
-        setSession(s);
-        setLoading(false);
+      try {
+        const s = await fetchSession();
+        if (mounted) setSession(s);
+      } catch (err) {
+        console.error("[auth] falha ao carregar sessão:", err);
+        if (mounted) setSession(null);
+      } finally {
+        if (mounted) setLoading(false);
       }
     })();
     return () => {
